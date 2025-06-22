@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Amadeus Passenger Name Generator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-6">
+  <div class="max-w-4xl mx-auto bg-white p-8 rounded shadow">
+    <h1 class="text-2xl font-bold mb-4">Passenger Name Entry (Amadeus Format)</h1>
+    <p class="text-sm text-gray-600 mb-6">Fill in passenger and booking details to generate Amadeus commands.</p>
+
+    <div id="passengerContainer" class="space-y-4 mb-6">
+      <!-- Passengers will be dynamically added here -->
+    </div>
+
+    <button onclick="addPassenger()" class="bg-green-500 text-white px-4 py-2 rounded mb-4">+ Add Passenger</button>
+
+    <h2 class="text-xl font-semibold mt-10 mb-2">Booking Info</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+      <input id="phone" type="text" class="p-2 border rounded" placeholder="Phone (e.g. YYC403-6152322)" value="YYC403-6152322">
+      <input id="email" type="text" class="p-2 border rounded" placeholder="Email (e.g. Royalholidays@shaw.ca)" value="Royalholidays@shaw.ca">
+      <input id="ticketing" type="text" class="p-2 border rounded" placeholder="Ticketing (e.g. TLTL15APR)" value="TLTL15APR">
+      <input id="receivedFrom" type="text" class="p-2 border rounded" placeholder="Received From (e.g. REROGER)" value="REROGER">
+      <input id="itineraryEmail" type="text" class="p-2 border rounded" placeholder="Send Email ITN (e.g. rogerlu88@gmail.com)" value="rogerlu88@gmail.com">
+    </div>
+
+    <button onclick="generateNM()" class="bg-blue-600 text-white px-6 py-2 rounded">Generate All Commands</button>
+
+    <div id="nmOutput" class="mt-6 bg-gray-50 p-4 rounded border text-sm hidden whitespace-pre"></div>
+  </div>
+
+  <script>
+    let passengerCount = 0;
+
+    function addPassenger() {
+      passengerCount++;
+      const container = document.createElement('div');
+      container.className = 'grid grid-cols-1 md:grid-cols-4 gap-4';
+      container.innerHTML = `
+        <input type="text" placeholder="Last Name" class="p-2 border rounded" data-type="last">
+        <input type="text" placeholder="First Name" class="p-2 border rounded" data-type="first">
+        <select class="p-2 border rounded" data-type="type">
+          <option value="ADT">Adult</option>
+          <option value="CHD">Child</option>
+          <option value="INF">Infant (Same LN)</option>
+          <option value="INF_DIFF">Infant (Diff LN)</option>
+        </select>
+        <input type="text" placeholder="DOB (e.g. 23JAN10)" class="p-2 border rounded" data-type="dob">
+      `;
+      document.getElementById('passengerContainer').appendChild(container);
+    }
+
+    function generateNM() {
+      const rows = document.querySelectorAll('#passengerContainer > div');
+      const nmEntries = [];
+      let infDiffEntries = [];
+
+      for (let row of rows) {
+        const last = row.querySelector('[data-type="last"]').value.toUpperCase().trim();
+        const first = row.querySelector('[data-type="first"]').value.toUpperCase().trim();
+        const type = row.querySelector('[data-type="type"]').value;
+        const dob = row.querySelector('[data-type="dob"]').value.trim();
+
+        if (!last || !first) continue;
+
+        if (type === 'ADT') {
+          nmEntries.push(`${last}/${first} MS`);
+        } else if (type === 'CHD') {
+          nmEntries.push(`${last}/${first} MSTR(CHD/${dob})`);
+        } else if (type === 'INF') {
+          if (nmEntries.length > 0) {
+            nmEntries[nmEntries.length - 1] += `(INF/${first}/${dob})`;
+          }
+        } else if (type === 'INF_DIFF') {
+          infDiffEntries.push(`INF${last}/${first}/${dob}`);
+        }
+      }
+
+      let output = '';
+      if (nmEntries.length > 0) {
+        output += `NM${nmEntries.length}${nmEntries.map(e => `/${e}`).join('')}\n`;
+      }
+      for (let i = 0; i < infDiffEntries.length; i++) {
+        output += `NM1${infDiffEntries[i]}\n`;
+      }
+
+      const phone = document.getElementById('phone').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const ticketing = document.getElementById('ticketing').value.trim();
+      const receivedFrom = document.getElementById('receivedFrom').value.trim();
+      const itineraryEmail = document.getElementById('itineraryEmail').value.trim();
+
+      if (phone) output += `AP ${phone}\n`;
+      if (email) output += `APE-${email}\n`;
+      if (ticketing) output += `${ticketing}\n`;
+      if (receivedFrom) output += `RF-${receivedFrom}\n`;
+      output += `ER\nIG\n`;
+      if (itineraryEmail) output += `ITL-EML-${itineraryEmail}\n`;
+      output += `IEPJ-EMLA\nDO1\n`;
+
+      const outputDiv = document.getElementById('nmOutput');
+      outputDiv.innerText = output;
+      outputDiv.classList.remove('hidden');
+    }
+
+    // Add one default passenger
+    addPassenger();
+  </script>
+</body>
+</html>
