@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Amadeus Command Generator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-6">
+  <div class="max-w-4xl mx-auto bg-white p-8 rounded shadow">
+    <h1 class="text-3xl font-bold mb-4">Amadeus Command Generator</h1>
+    <p class="mb-6 text-gray-600">Generate Amadeus commands for flight search, booking, pricing, and passenger info.</p>
+
+    <!-- Flight Search -->
+    <div class="grid grid-cols-2 gap-4 mb-6">
+      <div>
+        <label>Departure City</label>
+        <input id="depCity" class="w-full p-2 border rounded" value="YYC">
+      </div>
+      <div>
+        <label>Return City</label>
+        <input id="retCity" class="w-full p-2 border rounded" value="YVR">
+      </div>
+      <div>
+        <label>Departure Date</label>
+        <input id="depDate" type="date" class="w-full p-2 border rounded" value="2025-07-01">
+      </div>
+      <div>
+        <label>Return Date</label>
+        <input id="retDate" type="date" class="w-full p-2 border rounded" value="2025-07-10">
+      </div>
+      <div>
+        <label>Airline</label>
+        <input id="airline" class="w-full p-2 border rounded" value="WS">
+      </div>
+      <div class="flex items-center mt-6">
+        <input id="search7day" type="checkbox" class="mr-2" checked>
+        <label for="search7day">7-Day Search</label>
+      </div>
+    </div>
+
+    <!-- Passenger Info -->
+    <div class="grid grid-cols-2 gap-4 mb-6">
+      <div>
+        <label>Adults</label>
+        <input id="adults" type="number" value="1" class="w-full p-2 border rounded">
+      </div>
+      <div>
+        <label>Children (same last name)</label>
+        <input id="children" type="number" value="1" class="w-full p-2 border rounded">
+      </div>
+      <div>
+        <label>Infants (same last name)</label>
+        <input id="infants" type="number" value="1" class="w-full p-2 border rounded">
+      </div>
+      <div>
+        <label>Infants (different last name)</label>
+        <input id="infantsDiff" type="number" value="0" class="w-full p-2 border rounded">
+      </div>
+    </div>
+
+    <!-- Contact Info -->
+    <div class="grid grid-cols-2 gap-4 mb-6">
+      <div>
+        <label>Phone Number</label>
+        <input id="phone" class="w-full p-2 border rounded" value="4036152322">
+      </div>
+      <div>
+        <label>Ticketing</label>
+        <input id="ticketing" class="w-full p-2 border rounded" value="TL/30JUN">
+      </div>
+      <div>
+        <label>Received From</label>
+        <input id="receivedFrom" class="w-full p-2 border rounded" value="AGENT">
+      </div>
+      <div>
+        <label>Date of Birth</label>
+        <input id="dob" type="date" class="w-full p-2 border rounded" value="1990-01-01">
+      </div>
+    </div>
+
+    <!-- Booking & Pricing Options -->
+    <div class="mb-4">
+      <label class="block font-semibold mb-2">Pricing Options</label>
+      <div class="flex gap-4 flex-wrap">
+        <label><input type="checkbox" id="fxp" class="mr-1" checked>FXP (Price Itinerary)</label>
+        <label><input type="checkbox" id="fxa" class="mr-1">FXA (Price with Amadeus Negotiated Fares)</label>
+        <label><input type="checkbox" id="fxr" class="mr-1">FXR (Reissue pricing)</label>
+        <label><input type="checkbox" id="fxd" class="mr-1">FXD (Display fare breakdown)</label>
+        <label><input type="checkbox" id="fxx" class="mr-1">FXX (Fare Quote without Ticketing)</label>
+      </div>
+    </div>
+
+    <div class="mb-4">
+      <label class="block font-semibold mb-2">Booking Options</label>
+      <div class="flex gap-4 flex-wrap">
+        <label><input type="radio" name="booking" value="book" class="mr-1">Book lowest available</label>
+        <label><input type="radio" name="booking" value="price" class="mr-1" checked>Price lowest available</label>
+        <label><input type="radio" name="booking" value="store" class="mr-1">Store fare</label>
+      </div>
+    </div>
+
+    <div class="mb-6">
+      <label class="block font-semibold mb-2">Form of Payment</label>
+      <div class="flex gap-4 flex-wrap">
+        <label><input type="radio" name="payment" value="Cash" class="mr-1" checked>Cash</label>
+        <label><input type="radio" name="payment" value="Cheque" class="mr-1">Cheque</label>
+        <label><input type="radio" name="payment" value="Credit Card" class="mr-1">Credit Card</label>
+      </div>
+    </div>
+
+    <div class="flex items-center mb-6">
+      <input type="checkbox" id="ignore" class="mr-2" checked>
+      <label for="ignore">Ignore and Redisplay (IG)</label>
+    </div>
+
+    <button onclick="generateCommands()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded">Generate Amadeus Commands</button>
+
+    <div id="result" class="mt-6 whitespace-pre bg-gray-50 p-4 rounded border text-sm hidden"></div>
+  </div>
+
+  <script>
+    function generateCommands() {
+      const depCity = document.getElementById('depCity').value;
+      const retCity = document.getElementById('retCity').value;
+      const depDate = document.getElementById('depDate').value;
+      const retDate = document.getElementById('retDate').value;
+      const airline = document.getElementById('airline').value;
+      const adults = document.getElementById('adults').value;
+      const children = document.getElementById('children').value;
+      const infants = document.getElementById('infants').value;
+      const infantsDiff = document.getElementById('infantsDiff').value;
+      const phone = document.getElementById('phone').value;
+      const ticketing = document.getElementById('ticketing').value;
+      const receivedFrom = document.getElementById('receivedFrom').value;
+      const dob = document.getElementById('dob').value;
+      const ignore = document.getElementById('ignore').checked;
+
+      let commands = `AN${depDate}${depCity}${retCity}\n`;
+      if (retDate) commands += `AN${retDate}${retCity}${depCity}\n`;
+      if (airline) commands += `Airline Preference: ${airline}\n`;
+      commands += `Sell ${adults} Adult(s), ${children} Child(ren), ${infants} Infant(s), ${infantsDiff} Infant(s) w/ diff last name\n`;
+      if (phone) commands += `SR CTCM-${phone}\n`;
+      if (ticketing) commands += `TKTL/${ticketing}\n`;
+      if (receivedFrom) commands += `RF-${receivedFrom}\n`;
+      if (dob) commands += `Date of Birth: ${dob}\n`;
+      if (ignore) commands += `IG\n`;
+
+      if (document.getElementById('fxp').checked) commands += `FXP\n`;
+      if (document.getElementById('fxa').checked) commands += `FXA\n`;
+      if (document.getElementById('fxr').checked) commands += `FXR\n`;
+      if (document.getElementById('fxd').checked) commands += `FXD\n`;
+      if (document.getElementById('fxx').checked) commands += `FXX\n`;
+
+      const resultDiv = document.getElementById('result');
+      resultDiv.innerText = commands;
+      resultDiv.classList.remove('hidden');
+    }
+  </script>
+</body>
+</html>
