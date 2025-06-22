@@ -11,6 +11,22 @@
     <h1 class="text-2xl font-bold mb-4">Passenger Name Entry (Amadeus Format)</h1>
     <p class="text-sm text-gray-600 mb-6">Fill in passenger and booking details to generate Amadeus commands.</p>
 
+    <div class="mb-6 text-sm text-gray-700">
+      <h2 class="font-semibold mb-2">Command Descriptions:</h2>
+      <ul class="list-disc list-inside">
+        <li><strong>NM</strong>: Name element (adults, children, infants)</li>
+        <li><strong>AP</strong>: Phone contact (e.g. AP YYC403-6152322)</li>
+        <li><strong>APE</strong>: Email address of the passenger</li>
+        <li><strong>TKTL</strong>: Ticketing time limit (e.g. TLTL15APR)</li>
+        <li><strong>RF</strong>: Received from (agent or customer name)</li>
+        <li><strong>ER</strong>: End and Redisplay the PNR</li>
+        <li><strong>IG</strong>: Ignore changes</li>
+        <li><strong>IEPJ-EMLA</strong>: Itinerary receipt via email format</li>
+        <li><strong>ITL-EML</strong>: Email itinerary to provided address</li>
+        <li><strong>DO1</strong>: Display operational details of flight segment 1</li>
+      </ul>
+    </div>
+
     <div id="passengerContainer" class="space-y-4 mb-6">
       <!-- Passengers will be dynamically added here -->
     </div>
